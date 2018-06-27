@@ -1,0 +1,8 @@
+
+[[https://clojure.org/reference/deps_and_cli]]
+
+to support clojure cli on windows 10 build powershell script  from
+
+
+[[https://download.clojure.org/install/linux-install-1.9.0.381.sh]]
+
