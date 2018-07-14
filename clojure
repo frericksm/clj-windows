@@ -171,7 +171,7 @@ fi
 
 # Set dir containing the installed files
 install_dir=PREFIX
-tools_cp="$install_dir/libexec/clojure-tools-1.9.0.381.jar"
+tools_cp=$install_dir/libexec/clojure-tools-1.9.0.381.jar
 
 # Execute resolve-tags command
 if "$resolve_tags"; then

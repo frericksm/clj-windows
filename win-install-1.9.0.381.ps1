@@ -17,8 +17,8 @@ $clj_tools_archive_file_tar= "clojure-tools-1.9.0.381.tar"
 $install_dir=$prefix_dir + "\clojure"
 $lib_dir=$install_dir + "/lib"
 $lib_exec=$lib_dir+ "/libexec"
-$bin_dir="$prefix_dir/bin"
-$man_dir="$prefix_dir/share/man/man1"
+$bin_dir="$install_dir/bin"
+#$man_dir="$prefix_dir/share/man/man1"
 $clojure_lib_dir="$lib_dir/clojure"
 
 
@@ -56,10 +56,12 @@ $env:Path = $env:Path + ";C:\Program Files\7-zip"
 # cleanup install dir
 Get-Item  $install_dir  | Remove-Item  -Force -Recurse
 
-# prepare install dir 
+# prepare install dir cleanup
+
 New-Item -Path $install_dir -ItemType "directory"
 New-Item -Path $lib_dir  -ItemType "directory"
 New-Item -Path $lib_exec   -ItemType "directory"
+New-Item -Path $bin_dir   -ItemType "directory"
 
 echo "Installing libs into $clojure_lib_dir"
 Copy-Item clojure-tools/deps.edn $lib_dir
@@ -67,13 +69,16 @@ Copy-Item clojure-tools/example-deps.edn $lib_dir
 Copy-Item clojure-tools/clojure-tools-1.9.0.381.jar $lib_exec
 
 echo "Installing clojure and clj into $bin_dir"
-sed -i -e 's@PREFIX@'"$clojure_lib_dir"'@g' clojure-tools/clojure
-install -Dm755 clojure-tools/clojure "$bin_dir/clojure"
-install -Dm755 clojure-tools/clj "$bin_dir/clj"
+#sed -i -e 's@PREFIX@'"$clojure_lib_dir"'@g' clojure-tools/clojure
+Copy-Item $PSScriptRoot/clojure.cmd $bin_dir
+Copy-Item $PSScriptRoot/clj.cmd $bin_dir
 
-echo "Installing man pages into $man_dir"
-install -Dm644 clojure-tools/clojure.1 "$man_dir/clojure.1"
-install -Dm644 clojure-tools/clj.1 "$man_dir/clj.1"
+#install -Dm755 clojure-tools/clojure "$bin_dir"
+#install -Dm755 clojure-tools/clj "$bin_dir"
+
+#echo "Installing man pages into $man_dir"
+#install -Dm644 clojure-tools/clojure.1 "$man_dir/clojure.1"
+#install -Dm644 clojure-tools/clj.1 "$man_dir/clj.1"
 
 
 cleanup
