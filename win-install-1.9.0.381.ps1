@@ -73,6 +73,8 @@ echo "Installing clojure and clj into $bin_dir"
 Copy-Item $PSScriptRoot/clojure.cmd $bin_dir
 Copy-Item $PSScriptRoot/clj.cmd $bin_dir
 
+(Get-Content $bin_dir/clojure.cmd).Replace( 'PREFIX', $install_dir)| Set-Content $bin_dir/clojure.cmd
+
 #install -Dm755 clojure-tools/clojure "$bin_dir"
 #install -Dm755 clojure-tools/clj "$bin_dir"
 
