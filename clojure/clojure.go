@@ -5,21 +5,21 @@ package main
 import (
 	"fmt"
 	"hash/crc32"
+	"io"
 	"io/ioutil"
 	"os"
-"io"
 
-"log"
+	"log"
 	"os/exec"
-	"path/filepath"
 	"strings"
-
 )
+
 func check(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
 }
+
 // copies file at path src to path dest
 func copy(src string, dest string) {
 	from, err := os.Open(src)
@@ -83,9 +83,10 @@ func usage() {
 }
 
 func main() {
+	version := "1.9.0.391"
 
-	install_dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	tools_cp := install_dir + "/lib/libexec/clojure-tools-1.9.0.381.jar"
+	install_dir := os.Getenv("localappdata") + "/Programs/clojure"
+	tools_cp := install_dir + fmt.Sprintf("/lib/libexec/clojure-tools-%s.jar", version)
 
 	print_classpath := false
 	describe := false
@@ -256,10 +257,10 @@ func main() {
 
 	// Chain deps.edn in config paths. repro=skip config dir
 	if repro {
-		config_paths = append(config_paths, install_dir+"/deps.edn")
+		config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	} else {
-		config_paths = append(config_paths, install_dir+"/deps.edn")
+		config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, config_dir+"/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	}
@@ -309,7 +310,7 @@ func main() {
 
 	// Print paths in verbose mode
 	if verbose {
-		fmt.Println("version      = 1.9.0.381")
+		fmt.Println("version      = %s", version)
 		fmt.Printf("install_dir  =%s\n", install_dir)
 		fmt.Printf("config_dir   =%s\n", config_dir)
 		fmt.Printf("config_paths =%s\n", strings.Join(config_paths, " "))
@@ -395,7 +396,7 @@ func main() {
 
 		}
 
-		fmt.Printf("\n{:version 1.9.0.381\n"+
+		fmt.Printf("\n{:version %s\n"+
 			":config-files [%s]\n"+
 			":install-dir %s\n"+
 			":config-dir %s\n"+
@@ -406,7 +407,7 @@ func main() {
 			":classpath-aliases %s\n"+
 			":jvm-aliases %s\n"+
 			":main-aliases %s\n"+
-			":all-aliases %s\n}\n", path_vector,
+			":all-aliases %s\n}\n", version, path_vector,
 			install_dir, config_dir, cache_dir, force, repro, strings.Join(resolve_aliases, ""),
 			strings.Join(classpath_aliases, ""), strings.Join(jvm_aliases, ""),
 			strings.Join(main_aliases, ""), strings.Join(all_aliases, ""))

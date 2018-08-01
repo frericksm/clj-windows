@@ -1,21 +1,26 @@
+// The main package of the installer
+
 package main
 
 import (
 	"archive/tar"
 	"bufio"
 	"compress/gzip"
+	"fmt"
 	"io"
-		"log"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
-
-//see https://medium.com/@skdomino/taring-untaring-files-in-go-6b07cf56bc07
 
 // Untar takes a destination path and a reader; a tar reader loops over the tarfile
 // creating the file structure at 'dst' along the way, and writing any files
-func Untar(dst string, r io.Reader) error {
+
+//see https://medium.com/@skdomino/taring-untaring-files-in-go-6b07cf56bc07
+
+func untar(dst string, r io.Reader) error {
 
 	gzr, err := gzip.NewReader(r)
 	if err != nil {
@@ -81,26 +86,6 @@ func Untar(dst string, r io.Reader) error {
 	}
 }
 
-func RemoveContents(dir string) error {
-	d, err := os.Open(dir)
-	if err != nil {
-		return err
-	}
-	defer d.Close()
-	names, err := d.Readdirnames(-1)
-	if err != nil {
-		return err
-	}
-	for _, name := range names {
-		err = os.RemoveAll(filepath.Join(dir, name))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-
 // copies file at path src to path dest
 func copy(src string, dest string) {
 	from, err := os.Open(src)
@@ -124,8 +109,10 @@ func check(err error) {
 
 func main() {
 
-	url := "https://download.clojure.org/install/clojure-tools-1.9.0.381.tar.gz"
-	fname := "clojure-tools-1.9.0.381.tar.gz"
+	version := "1.9.0.391"
+	url := fmt.Sprintf("https://download.clojure.org/install/clojure-tools-%s.tar.gz", version)
+	fname := fmt.Sprintf("clojure-tools-%s.tar.gz", version)
+	lib_name := fmt.Sprintf("clojure-tools-%s.jar", version)
 
 	prefix_dir := os.Getenv("localappdata") + "/Programs"
 	if len(os.Args) == 2 {
@@ -138,8 +125,6 @@ func main() {
 	bin_dir := install_dir + "/bin"
 	out, err := os.Create(fname)
 	check(err)
-
-	//	defer out.Close()
 
 	resp, err := http.Get(url)
 	check(err)
@@ -156,7 +141,7 @@ func main() {
 	//	defer f.Close()
 
 	r := bufio.NewReader(f)
-	err = Untar(".", r)
+	err = untar(".", r)
 	check(err)
 	err = f.Close()
 	check(err)
@@ -169,8 +154,17 @@ func main() {
 	//Installing libs into $clojure_lib_dir
 	copy("clojure-tools/deps.edn", lib_dir+"/deps.edn")
 	copy("clojure-tools/example-deps.edn", lib_dir+"/example-deps.edn")
-	copy("clojure-tools/clojure-tools-1.9.0.381.jar", lib_exec+"/clojure-tools-1.9.0.381.jar")
-	copy("../clojure/clojure.exe", bin_dir+"/clojure.exe")
+	copy("clojure-tools/"+lib_name, lib_exec+"/"+lib_name)
+	copy("clojure.exe", bin_dir+"/clojure.exe")
+
+	// add bin_dir to path
+	path := os.Getenv("PATH")
+	fmt.Println(path)
+
+	if !strings.Contains(path, bin_dir) {
+		os.Setenv("PATH", path+string(os.PathListSeparator)+bin_dir)
+	}
+	fmt.Println(path)
 
 	// delete  install files
 	err = os.RemoveAll("clojure-tools")
