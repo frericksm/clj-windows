@@ -11,8 +11,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
-	"strings"
 )
 
 // Untar takes a destination path and a reader; a tar reader loops over the tarfile
@@ -158,13 +158,16 @@ func main() {
 	copy("clojure.exe", bin_dir+"/clojure.exe")
 
 	// add bin_dir to path
-	path := os.Getenv("PATH")
-	fmt.Println(path)
 
-	if !strings.Contains(path, bin_dir) {
-		os.Setenv("PATH", path+string(os.PathListSeparator)+bin_dir)
-	}
-	fmt.Println(path)
+	cmd_args := []string{"-ExecutionPolicy", "remotesigned", "-File", "setpath.ps1"}
+
+	cmd := exec.Command("Powershell.exe", cmd_args...)
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+
+	cmd.Run()
 
 	// delete  install files
 	err = os.RemoveAll("clojure-tools")
