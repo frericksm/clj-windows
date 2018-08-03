@@ -1,7 +1,21 @@
-# Clojure installer and CLI tools for 	windows
+# Warning
+
+
+Alex Miller points out that he is working on an official installer for windows and asks that my project clearly differentiate itself from the official installers.
+
+see https://groups.google.com/d/msg/clojure/nw66LtqsaWU/rMv1GWEfDAAJ)
+
+I am doing this:
+
+THIS IS NOT THE OFFICIAL  installer for clojure and cli tools on windows
+
+
+
+# Clojure installer and CLI tools for 	windows (* NON-OFFICIAL*)
 
 this is  for installing the clojure  CLI tools on windows 
 see cli https://clojure.org/guides/getting_started
+
 
 ## Installation
 1. Download the latest release from https://github.com/frericksm/clj-windows/releases
