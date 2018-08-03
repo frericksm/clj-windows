@@ -5,8 +5,8 @@ see cli https://clojure.org/guides/getting_started
 
 ## Installation
 1. Download the latest release from https://github.com/frericksm/clj-windows/releases
-2. Extract it to some <local-path>
-3. Execute <local-path>\windows-clojure-tools-1.9.0.391\install.exe
+2. Extract it to some `<local-path>`
+3. Execute `<local-path>`\windows-clojure-tools-1.9.0.391\install.exe
 
 
 ## Build from source
