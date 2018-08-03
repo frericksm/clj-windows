@@ -24,5 +24,5 @@ see cli https://clojure.org/guides/getting_started
 7. run "go build"
 8. change directory to /clj-windows
 9. run "mvn package"
-10. see clj-windows/target for build results  an follow the intalltion task above
+10. see clj-windows/target for build results  an follow the installation task above
 
