@@ -31,5 +31,13 @@
     </includes>
 	<fileMode>0744</fileMode>
   </fileSet>
+ <fileSet>
+    <directory>clj</directory>
+    <outputDirectory></outputDirectory>
+    <includes>
+      <include>clj.exe</include>
+    </includes>
+	<fileMode>0744</fileMode>
+  </fileSet>
 </fileSets>
 </assembly>

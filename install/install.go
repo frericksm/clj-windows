@@ -156,6 +156,7 @@ func main() {
 	copy("clojure-tools/example-deps.edn", lib_dir+"/example-deps.edn")
 	copy("clojure-tools/"+lib_name, lib_exec+"/"+lib_name)
 	copy("clojure.exe", bin_dir+"/clojure.exe")
+	copy("clj.exe", bin_dir+"/clj.exe")
 
 	// add bin_dir to path
 
