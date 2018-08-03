@@ -22,7 +22,6 @@
       <include>setpath.ps1</include>
     </includes>
 	<fileMode>0744</fileMode>
-    <lineEnding>dos</lineEnding>
   </fileSet>
   <fileSet>
     <directory>clojure</directory>
@@ -31,7 +30,6 @@
       <include>clojure.exe</include>
     </includes>
 	<fileMode>0744</fileMode>
-    <lineEnding>dos</lineEnding>
   </fileSet>
 </fileSets>
 </assembly>
