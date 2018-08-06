@@ -53,7 +53,7 @@ func usage() {
 	 -Calias...     Concatenated make-classpath aliases, ex: -C:dev
 	 -Malias...     Concatenated main option aliases, ex: -M:test
 	 -Aalias...     Concatenated aliases of any kind, ex: -A:dev:mem
-	 -Sdeps EDN     Deps data to use as the final deps file
+ 	 -Sdeps EDN     Deps data to use as the last deps file to be merged
 	 -Spath         Compute classpath and echo to stdout only
 	 -Scp CP        Do NOT compute or cache classpath, use this one instead
 	 -Srepro        Ignore the ~/.clojure/deps.edn config file
@@ -111,8 +111,8 @@ func main() {
 	var cache_dir string
 	additional_args := make([]string, 0)
 
-	for _, arg := range os.Args[1:] {
-
+	for i := 1; i < len(os.Args); i++ {
+		arg := os.Args[i]
 		switch {
 		case strings.HasPrefix(arg, "-J"):
 			jvm_opts = append(jvm_opts, arg[2:])
@@ -127,9 +127,11 @@ func main() {
 		case strings.HasPrefix(arg, "-A"):
 			main_aliases = append(main_aliases, arg[2:])
 		case strings.HasPrefix(arg, "-Sdeps"):
-			deps_data = arg
+			i = i + 1
+			deps_data = os.Args[i]
 		case strings.HasPrefix(arg, "-Scp"):
-			force_cp = arg
+			i = i + 1
+			force_cp = os.Args[i]
 		case strings.HasPrefix(arg, "-Spath"):
 			print_classpath = true
 		case strings.HasPrefix(arg, "-Sverbose"):
@@ -160,6 +162,7 @@ func main() {
 		}
 
 	}
+	//	fmt.Printf("additional args: %s", additional_args)
 
 	if help {
 		usage()
@@ -169,42 +172,11 @@ func main() {
 
 	config_dir := os.Getenv("CLJ_CONFIG")
 	config_home := os.Getenv("XDG_CONFIG_HOME")
-	home := os.Getenv("LOCALAPPDATA")
+	home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
 	var config_str string
 
 	var cmd *exec.Cmd
 	var cmd_args []string
-	var tools_args []string
-
-	// Make tools args if needed
-	if stale || pom {
-		tools_args = make([]string, 0)
-
-		if deps_data != "" {
-			tools_args = append(tools_args, "--config-data")
-			tools_args = append(tools_args, deps_data)
-		}
-		if len(resolve_aliases) > 0 {
-			tools_args = append(tools_args, "-R"+strings.Join(resolve_aliases, ""))
-		}
-		if len(classpath_aliases) > 0 {
-			tools_args = append(tools_args, "-C"+strings.Join(classpath_aliases, ""))
-		}
-		if len(jvm_aliases) > 0 {
-			tools_args = append(tools_args, "-J"+strings.Join(jvm_aliases, ""))
-		}
-		if len(main_aliases) > 0 {
-			tools_args = append(tools_args, "-M"+strings.Join(main_aliases, ""))
-		}
-		if len(all_aliases) > 0 {
-			tools_args = append(tools_args, "-A"+strings.Join(all_aliases, ""))
-		}
-		if force_cp != "" {
-			tools_args = append(tools_args, "--skip-cp")
-
-		}
-
-	}
 
 	deps_edn_file_exists = true
 	if _, err := os.Stat("deps.edn"); os.IsNotExist(err) {
@@ -217,17 +189,16 @@ func main() {
 			fmt.Println("deps.edn does not exist")
 			return
 		}
+		cmd = exec.Command("java.exe", "-Xmx256m", "-cp", tools_cp, "clojure.main", "-m",
+			"clojure.tools.deps.alpha.script.resolve-tags", "--deps-file=deps.edn")
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Stdin = os.Stdin
+
+		//		fmt.Println("resolve-tags")
+		//		fmt.Println(cmd_args)
+		cmd.Run()
 	}
-
-	cmd = exec.Command("java.exe", "-Xmx256m", "-cp", tools_cp, "clojure.main", "-m",
-		"clojure.tools.deps.alpha.script.resolve-tags", "--deps-file=deps.edn")
-
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-
-	//	fmt.Println(cmd_args)
-	cmd.Run()
 
 	// Determine user config directory
 
@@ -310,7 +281,7 @@ func main() {
 
 	// Print paths in verbose mode
 	if verbose {
-		fmt.Println("version      = %s", version)
+		fmt.Printf("version      = %s\n", version)
 		fmt.Printf("install_dir  =%s\n", install_dir)
 		fmt.Printf("config_dir   =%s\n", config_dir)
 		fmt.Printf("config_paths =%s\n", strings.Join(config_paths, " "))
@@ -336,12 +307,46 @@ func main() {
 
 			cpf_info, err := os.Stat(cpf)
 			if err != nil {
-				check(err)
+
+				stale = true
+				break
 			}
 			if cpf_info.ModTime().After(cp_file_info.ModTime()) {
 				stale = true
+				break
 			}
 		}
+	}
+	var tools_args []string
+
+	// Make tools args if needed
+	if stale || pom {
+		tools_args = make([]string, 0)
+
+		if deps_data != "" {
+			tools_args = append(tools_args, "--config-data")
+			tools_args = append(tools_args, deps_data)
+		}
+		if len(resolve_aliases) > 0 {
+			tools_args = append(tools_args, "-R"+strings.Join(resolve_aliases, ""))
+		}
+		if len(classpath_aliases) > 0 {
+			tools_args = append(tools_args, "-C"+strings.Join(classpath_aliases, ""))
+		}
+		if len(jvm_aliases) > 0 {
+			tools_args = append(tools_args, "-J"+strings.Join(jvm_aliases, ""))
+		}
+		if len(main_aliases) > 0 {
+			tools_args = append(tools_args, "-M"+strings.Join(main_aliases, ""))
+		}
+		if len(all_aliases) > 0 {
+			tools_args = append(tools_args, "-A"+strings.Join(all_aliases, ""))
+		}
+		if force_cp != "" {
+			tools_args = append(tools_args, "--skip-cp")
+
+		}
+
 	}
 
 	// If stale, run make-classpath to refresh cached classpath
@@ -358,7 +363,7 @@ func main() {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
-
+		//		fmt.Println("make-classpath")
 		//		fmt.Println(cmd_args)
 		cmd.Run()
 	}
@@ -368,10 +373,12 @@ func main() {
 	var err error
 	if force_cp != "" {
 		cp = force_cp
+	} else {
+
+		content, err = ioutil.ReadFile(cp_file)
+		check(err)
+		cp = string(content)
 	}
-	content, err = ioutil.ReadFile(cp_file)
-	check(err)
-	cp = string(content)
 
 	if pom {
 		cmd_args := []string{"-Xmx256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.generate-manifest", "--config-files", config_str, "--gen=pom"}
@@ -382,6 +389,7 @@ func main() {
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
 
+		//		fmt.Println("make-classpath")
 		//		fmt.Println(cmd_args)
 		cmd.Run()
 	} else if print_classpath {
@@ -420,6 +428,7 @@ func main() {
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
 
+		//		fmt.Println("print-tree")
 		//		fmt.Println(cmd_args)
 		cmd.Run()
 		return
@@ -464,8 +473,9 @@ func main() {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
+		//		fmt.Println("clojure.main")
 
-		//	fmt.Println(cmd_args)
+		//		fmt.Println(cmd_args)
 		cmd.Run()
 
 	}
