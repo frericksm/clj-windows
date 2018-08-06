@@ -72,7 +72,7 @@ while following command runs on unix
 clj -Sdeps '{:deps {cider/cider-nrepl {:mvn/version "0.18.0"} }}' -e '(require (quote cider-nrepl.main)) (cider-nrepl.main/init ["cider.nrepl/cider-middleware"])'
 ```
 it will not run on windows.
-You have to use double quotes instead of single quotes  an additionally you have to escape double quotes in strings with a backslash. so the mofified command 
+You have to use double quotes instead of single quotes  an additionally you have to escape double quotes in strings with a backslash. so the modified command 
 
 ```
 clj -Sdeps "{:deps {cider/cider-nrepl {:mvn/version \"0.18.0\"} }}" -e "(require (quote cider-nrepl.main)) (cider-nrepl.main/init [\"cider.nrepl/cider-middleware\"])"
