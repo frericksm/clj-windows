@@ -1,4 +1,8 @@
-# Warning
+# Clojure installer and CLI tools for windows 
+
+this is for installing the clojure  CLI tools on windows 
+
+## Warning
 
 
 Alex Miller points out that he is working on an official installer for windows and asks that my project clearly differentiate itself from the official installers.
@@ -13,9 +17,6 @@ see cli https://clojure.org/guides/getting_started for the official installers
 
 
 
-# Clojure installer and CLI tools for windows 
-
-this is for installing the clojure  CLI tools on windows 
 
 
 
@@ -58,3 +59,22 @@ where  VERSION is replaced by the current version  1.9.0.391 (at the time of wri
 9. run "mvn package"
 10. see clj-windows/target for build results  an follow the installation task above
 
+
+# Command line arguments
+
+ There is a subtle difference in  parsing command line arguments between unix and windows 
+
+while following command runs on unix 
+
+
+```
+
+clj -Sdeps '{:deps {cider/cider-nrepl {:mvn/version "0.18.0"} }}' -e '(require (quote cider-nrepl.main)) (cider-nrepl.main/init ["cider.nrepl/cider-middleware"])'
+```
+it will not run on windows.
+You have to use double quotes instead of single quotes  an additionally you have to escape double quotes in strings with a backslash. so the mofified command 
+
+```
+clj -Sdeps "{:deps {cider/cider-nrepl {:mvn/version \"0.18.0\"} }}" -e "(require (quote cider-nrepl.main)) (cider-nrepl.main/init [\"cider.nrepl/cider-middleware\"])"
+```
+runs on windows and *surprise*  it also runs on unix
