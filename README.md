@@ -23,13 +23,13 @@ see cli https://clojure.org/guides/getting_started for the official installers
 ## Installation
 1. Download the latest release from https://github.com/frericksm/clj-windows/releases
 2. Extract it to some `<local-path>`
-3. Execute `<local-path>`\windows-clojure-tools-1.9.0.391\install.exe
+3. Execute `<local-path>`\windows-clojure-tools-1.9.0.397\install.exe
 
 ### How install.exe works:
 install.exe does the following things:
 
 1. It downloads and extracts  https://download.clojure.org/install/clojure-tools-VERSION.tar.gz
-where  VERSION is replaced by the current version  1.9.0.391 (at the time of writing)  
+where  VERSION is replaced by the current version  1.9.0.397 (at the time of writing)  
 
 2. creates and fills the folder
     %localappdata%/Programs\clojure
@@ -72,7 +72,7 @@ while following command runs on unix
 clj -Sdeps '{:deps {cider/cider-nrepl {:mvn/version "0.18.0"} }}' -e '(require (quote cider-nrepl.main)) (cider-nrepl.main/init ["cider.nrepl/cider-middleware"])'
 ```
 it will not run on windows.
-You have to use double quotes instead of single quotes  an additionally you have to escape double quotes in strings with a backslash. so the mofified command 
+You have to use double quotes instead of single quotes  an additionally you have to escape double quotes in strings with a backslash. so the modified command 
 
 ```
 clj -Sdeps "{:deps {cider/cider-nrepl {:mvn/version \"0.18.0\"} }}" -e "(require (quote cider-nrepl.main)) (cider-nrepl.main/init [\"cider.nrepl/cider-middleware\"])"
