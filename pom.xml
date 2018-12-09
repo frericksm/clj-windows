@@ -7,7 +7,7 @@
   <!-- The Basics -->
   <groupId>com.frericksm</groupId>
   <artifactId>windows-clojure-tools</artifactId>
-  <version>1.9.0.391</version>
+  <version>1.9.0.397</version>
  
  <build>
  <plugins>
