@@ -83,7 +83,7 @@ func usage() {
 }
 
 func main() {
-	version := "1.9.0.397"
+	version := "1.10.0.411"
 
 	install_dir := os.Getenv("localappdata") + "/Programs/clojure"
 	tools_cp := install_dir + fmt.Sprintf("/lib/libexec/clojure-tools-%s.jar", version)
