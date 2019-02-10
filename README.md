@@ -14,6 +14,7 @@ I am doing this:
 THIS IS NOT THE OFFICIAL  installer for clojure and cli tools on windows
 
 see cli https://clojure.org/guides/getting_started for the official installers
+and https://dev.clojure.org/jira/browse/TDEPS-67 for progress  on the windows part
 
 
 
