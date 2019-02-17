@@ -125,7 +125,7 @@ func main() {
 		case strings.HasPrefix(arg, "-M"):
 			main_aliases = append(main_aliases, arg[2:])
 		case strings.HasPrefix(arg, "-A"):
-			main_aliases = append(main_aliases, arg[2:])
+                        all_aliases = append(all_aliases, arg[2:])
 		case strings.HasPrefix(arg, "-Sdeps"):
 			i = i + 1
 			deps_data = os.Args[i]
