@@ -462,7 +462,8 @@ func main() {
 		cmd_args = append(cmd_args, "-Dclojure.libfile="+libs_file, "-cp", cp, "clojure.main")
 
 		if main_cache_opts != "" {
-			cmd_args = append(cmd_args, main_cache_opts)
+			words := strings.Fields(main_cache_opts)
+			cmd_args = append(cmd_args, words...)
 
 		}
 
