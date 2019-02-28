@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	//"path/filepath"
 
 	"log"
 	"os/exec"
@@ -18,6 +19,18 @@ func check(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// exists returns whether the given file or directory exists
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return true, err
 }
 
 // copies file at path src to path dest
@@ -83,11 +96,24 @@ func usage() {
 }
 
 func main() {
+
 	version := "1.10.0.414"
 
+	wd, _ := os.Getwd()
+	local_install_dir := wd + "/.."
 	install_dir := os.Getenv("localappdata") + "/Programs/clojure"
-	tools_cp := install_dir + fmt.Sprintf("/lib/libexec/clojure-tools-%s.jar", version)
 
+	jarfile := fmt.Sprintf("/lib/libexec/clojure-tools-%s.jar", version)
+	local_jar := local_install_dir + jarfile
+
+	if jarfile_exists, _ := exists(local_jar); jarfile_exists {
+		install_dir = local_install_dir
+	}
+	// fmt.Printf("local_install_dir: %s\n", local_install_dir)
+	// fmt.Printf("local_jar: %s\n", local_jar)
+	//fmt.Printf("install_dir: %s\n", install_dir)
+
+	tools_cp := install_dir + jarfile
 	print_classpath := false
 	describe := false
 	verbose := false
@@ -125,7 +151,7 @@ func main() {
 		case strings.HasPrefix(arg, "-M"):
 			main_aliases = append(main_aliases, arg[2:])
 		case strings.HasPrefix(arg, "-A"):
-                        all_aliases = append(all_aliases, arg[2:])
+			all_aliases = append(all_aliases, arg[2:])
 		case strings.HasPrefix(arg, "-Sdeps"):
 			i = i + 1
 			deps_data = os.Args[i]
@@ -404,21 +430,21 @@ func main() {
 
 		}
 
-		fmt.Printf("\n{:version %s\n"+
+		fmt.Printf("\n{:version \"%s\"\n"+
 			":config-files [%s]\n"+
-			":install-dir %s\n"+
-			":config-dir %s\n"+
-			":cache-dir %s\n"+
+			":install-dir \"%s\"\n"+
+			":config-dir \"%s\"\n"+
+			":cache-dir \"%s\"\n"+
 			":force %t\n"+
 			":repro %t\n"+
-			":resolve-aliases %s\n"+
-			":classpath-aliases %s\n"+
-			":jvm-aliases %s\n"+
-			":main-aliases %s\n"+
-			":all-aliases %s\n}\n", version, path_vector,
+			":resolve-aliases \"%s\"\n"+
+			":classpath-aliases \"%s\"\n"+
+			":jvm-aliases \"%s\"\n"+
+			":main-aliases \"%s\"\n"+
+			":all-aliases \"%s\"\n}\n", version, path_vector,
 			install_dir, config_dir, cache_dir, force, repro, strings.Join(resolve_aliases, ""),
-			strings.Join(classpath_aliases, ""), strings.Join(jvm_aliases, ""),
-			strings.Join(main_aliases, ""), strings.Join(all_aliases, ""))
+			strings.Join(classpath_aliases, ":"), strings.Join(jvm_aliases, ""),
+			strings.Join(main_aliases, ":"), strings.Join(all_aliases, ""))
 
 	} else if tree {
 		cmd_args = []string{"-Xmx256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.print-tree", "--libs-file", libs_file}
