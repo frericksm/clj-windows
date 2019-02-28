@@ -24,7 +24,8 @@ and https://dev.clojure.org/jira/browse/TDEPS-67 for progress  on the windows pa
 ## Installation
 1. Download the latest release from https://github.com/frericksm/clj-windows/releases
 2. Extract it to some `<local-path>`
-3. Execute `<local-path>`\windows-clojure-tools-1.10.0.414\install.exe
+3. Execute `<local-path>`\windows-clojure-tools-1.10.0.414.1\install.exe [install_dir]
+with the optional install_dir
 
 ### How install.exe works:
 install.exe does the following things:
@@ -32,13 +33,14 @@ install.exe does the following things:
 1. It downloads and extracts  https://download.clojure.org/install/clojure-tools-VERSION.tar.gz
 where  VERSION is replaced by the current version  1.10.0.414 (at the time of writing)  
 
-2. creates and fills the folder
-    %localappdata%/Programs\clojure
+2. creates and fills the folder [install_dir] if set or %localappdata%/Programs\clojure 
+	
+     
 
     where  %localappdata% is the expansion of the environment variable LOCALAPPDATA
 3. It adds the path %localappdata%/Programs\clojure\bin to the environment variable PATH in scope USER
 ## Deinstallation 
-1. Delete the folder %localappdata%/Programs\clojure
+1. Delete the folder %localappdata%/Programs\clojure or [install_dir]
 2. Remove %localappdata%/Programs\clojure\bin from  the environment variable PATH in scope USER
 
 
