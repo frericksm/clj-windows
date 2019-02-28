@@ -107,6 +107,8 @@ func check(err error) {
 	}
 }
 
+// accepts one optional commandline  arg which is the name of the directory in which the clojure dir will be created.
+//
 func main() {
 
 	version := "1.10.0.414"
@@ -160,7 +162,7 @@ func main() {
 
 	// add bin_dir to path
 
-	cmd_args := []string{"-ExecutionPolicy", "remotesigned", "-File", "setpath.ps1"}
+	cmd_args := []string{"-ExecutionPolicy", "remotesigned", "-File", "setpath.ps1", "-install_dir", install_dir}
 
 	cmd := exec.Command("Powershell.exe", cmd_args...)
 
