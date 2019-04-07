@@ -31,7 +31,7 @@ with the optional install_dir
 install.exe does the following things:
 
 1. It downloads and extracts  https://download.clojure.org/install/clojure-tools-VERSION.tar.gz
-where  VERSION is replaced by the current version  1.10.0.414 (at the time of writing)  
+where  VERSION is replaced by the current version  1.10.0.442 (at the time of writing)  
 
 2. creates and fills the folder [install_dir] if set or %localappdata%/Programs\clojure 
 	
