@@ -43,7 +43,7 @@ func proxyargs() []string {
 	https_proxy_url, _ := url.Parse(os.Getenv("https_proxy"))
 	//check env var http_proxy and transform to java option
 	if http_proxy_url != nil {
-		proxy_args := append(proxy_args, "-Dhttp.proxyHost="+http_proxy_url.Hostname())
+		proxy_args = append(proxy_args, "-Dhttp.proxyHost="+http_proxy_url.Hostname())
 		http_proxy_port := http_proxy_url.Port()
 		if http_proxy_port != "" {
 			proxy_args = append(proxy_args, "-Dhttp.proxyPort="+http_proxy_port)
@@ -59,8 +59,8 @@ func proxyargs() []string {
 		}
 	}
 
-	//		fmt.Println("proxy_args")
-	//		fmt.Println(proxy_args)
+	//	fmt.Println("proxy_args")
+	//	fmt.Println(proxy_args)
 
 	return proxy_args
 }
