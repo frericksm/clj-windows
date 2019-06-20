@@ -11,6 +11,7 @@ import (
 	//"path/filepath"
 
 	"log"
+	"net/url"
 	"os/exec"
 	"strings"
 )
@@ -31,6 +32,37 @@ func exists(path string) (bool, error) {
 		return false, nil
 	}
 	return true, err
+}
+
+// returns env var http_proxy an https_proxy as java options -Dhttp.proxyHost...
+func proxyargs() []string {
+
+	proxy_args := []string{}
+
+	http_proxy_url, _ := url.Parse(os.Getenv("http_proxy"))
+	https_proxy_url, _ := url.Parse(os.Getenv("https_proxy"))
+	//check env var http_proxy and transform to java option
+	if http_proxy_url != nil {
+		proxy_args = append(proxy_args, "-Dhttp.proxyHost="+http_proxy_url.Hostname())
+		http_proxy_port := http_proxy_url.Port()
+		if http_proxy_port != "" {
+			proxy_args = append(proxy_args, "-Dhttp.proxyPort="+http_proxy_port)
+		}
+	}
+
+	//check env var https_proxy and transform to java option
+	if https_proxy_url != nil {
+		proxy_args = append(proxy_args, "-Dhttps.proxyHost="+https_proxy_url.Hostname())
+		https_proxy_port := https_proxy_url.Port()
+		if https_proxy_port != "" {
+			proxy_args = append(proxy_args, "-Dhttps.proxyPort="+https_proxy_port)
+		}
+	}
+
+	//	fmt.Println("proxy_args")
+	//	fmt.Println(proxy_args)
+
+	return proxy_args
 }
 
 // copies file at path src to path dest
@@ -382,7 +414,10 @@ func main() {
 	}
 	if stale {
 
-		cmd_args = []string{"-Xmx256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath", "--config-files", config_str, "--libs-file", libs_file, "--cp-file", cp_file, "--jvm-file", jvm_file, "--main-file", main_file}
+		make_classpath_args := []string{"-Xmx256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath", "--config-files", config_str, "--libs-file", libs_file, "--cp-file", cp_file, "--jvm-file", jvm_file, "--main-file", main_file}
+
+		cmd_args = proxyargs()
+		cmd_args = append(cmd_args, make_classpath_args...)
 		cmd_args = append(cmd_args, tools_args...)
 		cmd = exec.Command("java.exe", cmd_args...)
 
