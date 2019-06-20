@@ -63,6 +63,20 @@ install.exe does the following things:
 9. run "mvn package"
 10. see clj-windows/target for build results  an follow the installation task above
 
+# Proxy settings
+
+If you behind a proxy there are two situation where you cannot get away with  JVM option aliases 
+##  Proxy settings while installation 
+
+This is an open issue https://github.com/frericksm/clj-windows/issues/8
+
+## Proxy settings while classpath calculation
+
+Until https://clojure.atlassian.net/browse/TDEPS-124 is fixed in an adaptable way,
+i fixed it here as described in https://github.com/frericksm/clj-windows/issues/6 
+
+the the env vars http_proxy and  https_proxy will be used  to set the appropriate system properties to the 
+java call of clojure.tools.deps.alpha.script.make-classpath
 
 # Command line arguments
 
