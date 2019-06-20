@@ -8,7 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	//"path/filepath"
+	"path/filepath"
 
 	"log"
 	"net/url"
@@ -131,8 +131,12 @@ func main() {
 
 	version := "1.10.1.447"
 
-	wd, _ := os.Getwd()
-	local_install_dir := wd + "/.."
+	exec_path, _ := os.Executable()
+	wd := filepath.Dir(exec_path)
+	local_install_dir := filepath.Dir(wd)
+	//	fmt.Println("wd: " + wd)
+	//	fmt.Println("local_install_dir: " + local_install_dir)
+
 	install_dir := os.Getenv("localappdata") + "/Programs/clojure"
 
 	jarfile := fmt.Sprintf("/lib/libexec/clojure-tools-%s.jar", version)
