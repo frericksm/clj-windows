@@ -129,7 +129,7 @@ func usage() {
 
 func main() {
 
-	version := "1.10.0.447"
+	version := "1.10.1.447"
 
 	wd, _ := os.Getwd()
 	local_install_dir := wd + "/.."
