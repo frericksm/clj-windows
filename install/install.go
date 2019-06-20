@@ -127,7 +127,9 @@ func main() {
 	bin_dir := install_dir + "/bin"
 	out, err := os.Create(fname)
 	check(err)
-
+	// TODO set proxy
+	//  a)https://stackoverflow.com/questions/14661511/setting-up-proxy-for-http-client
+	// b)https://stackoverflow.com/questions/14669958/error-when-fetching-url-through-proxy-in-go
 	resp, err := http.Get(url)
 	check(err)
 
