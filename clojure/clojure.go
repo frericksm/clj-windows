@@ -202,7 +202,7 @@ func main() {
 			describe = true
 		case strings.HasPrefix(arg, "-Sforce"):
 			force = true
-		case strings.HasPrefix(arg, "-Srepo"):
+		case strings.HasPrefix(arg, "-Srepro"):
 			repro = true
 		case strings.HasPrefix(arg, "-Stree"):
 			tree = true
@@ -290,10 +290,8 @@ func main() {
 
 	// Chain deps.edn in config paths. repro=skip config dir
 	if repro {
-		config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	} else {
-		config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, config_dir+"/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	}
