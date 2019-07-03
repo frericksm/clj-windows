@@ -156,7 +156,6 @@ func main() {
 	os.MkdirAll(bin_dir, 0700)
 
 	//Installing libs into $clojure_lib_dir
-	copy("clojure-tools/deps.edn", lib_dir+"/deps.edn")
 	copy("clojure-tools/example-deps.edn", lib_dir+"/example-deps.edn")
 	copy("clojure-tools/"+lib_name, lib_exec+"/"+lib_name)
 	copy("clojure.exe", bin_dir+"/clojure.exe")
