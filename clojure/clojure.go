@@ -129,7 +129,7 @@ func usage() {
 
 func main() {
 
-	version := "1.10.1.458"
+	version := "1.10.1.462"
 
 	exec_path, _ := os.Executable()
 	wd := filepath.Dir(exec_path)
@@ -290,8 +290,10 @@ func main() {
 
 	// Chain deps.edn in config paths. repro=skip config dir
 	if repro {
+                config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	} else {
+                config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, config_dir+"/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	}
