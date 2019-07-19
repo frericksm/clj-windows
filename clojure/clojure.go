@@ -251,7 +251,7 @@ func main() {
 			fmt.Println("deps.edn does not exist")
 			return
 		}
-		cmd = exec.Command("java.exe", "-Xmx256m", "-cp", tools_cp, "clojure.main", "-m",
+		cmd = exec.Command("java.exe", "-Xms256m", "-cp", tools_cp, "clojure.main", "-m",
 			"clojure.tools.deps.alpha.script.resolve-tags", "--deps-file=deps.edn")
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -290,10 +290,10 @@ func main() {
 
 	// Chain deps.edn in config paths. repro=skip config dir
 	if repro {
-                config_paths = append(config_paths, install_dir+"/lib/deps.edn")
+		config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	} else {
-                config_paths = append(config_paths, install_dir+"/lib/deps.edn")
+		config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, config_dir+"/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	}
@@ -418,7 +418,7 @@ func main() {
 	}
 	if stale {
 
-		make_classpath_args := []string{"-Xmx256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath", "--config-files", config_str, "--libs-file", libs_file, "--cp-file", cp_file, "--jvm-file", jvm_file, "--main-file", main_file}
+		make_classpath_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath", "--config-files", config_str, "--libs-file", libs_file, "--cp-file", cp_file, "--jvm-file", jvm_file, "--main-file", main_file}
 
 		cmd_args = proxyargs()
 		cmd_args = append(cmd_args, make_classpath_args...)
@@ -446,7 +446,7 @@ func main() {
 	}
 
 	if pom {
-		cmd_args := []string{"-Xmx256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.generate-manifest", "--config-files", config_str, "--gen=pom"}
+		cmd_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.generate-manifest", "--config-files", config_str, "--gen=pom"}
 		cmd_args = append(cmd_args, tools_args...)
 		cmd = exec.Command("java.exe", cmd_args...)
 
@@ -486,7 +486,7 @@ func main() {
 			strings.Join(main_aliases, ":"), strings.Join(all_aliases, ""))
 
 	} else if tree {
-		cmd_args = []string{"-Xmx256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.print-tree", "--libs-file", libs_file}
+		cmd_args = []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.print-tree", "--libs-file", libs_file}
 		cmd = exec.Command("java.exe", cmd_args...)
 
 		cmd.Stdout = os.Stdout
