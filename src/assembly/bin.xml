@@ -15,6 +15,23 @@
     </includes>
   </fileSet>
   <fileSet>
+    <directory>target/classes</directory>
+	<outputDirectory></outputDirectory>
+    <includes>
+      <include>deps.edn</include>
+      <include>example-deps.edn</include>
+    </includes>
+	<fileMode>0744</fileMode>
+  </fileSet>
+  <fileSet>
+    <directory>target</directory>
+	<outputDirectory></outputDirectory>
+    <includes>
+      <include>clojure-tools-*.jar</include>
+    </includes>
+	<fileMode>0744</fileMode>
+  </fileSet>
+  <fileSet>
     <directory>install</directory>
 	<outputDirectory></outputDirectory>
     <includes>
