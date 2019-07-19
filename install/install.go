@@ -112,10 +112,6 @@ func check(err error) {
 func main() {
 
 	version := "1.10.1.466"
-	/**
-		url := fmt.Sprintf("https://download.clojure.org/install/clojure-tools-%s.tar.gz", version)
-		fname := fmt.Sprintf("clojure-tools-%s.tar.gz", version)
-	**/
 	lib_name := fmt.Sprintf("clojure-tools-%s.jar", version)
 
 	prefix_dir := os.Getenv("localappdata") + "/Programs"
@@ -127,35 +123,6 @@ func main() {
 	lib_dir := install_dir + "/lib"
 	lib_exec := lib_dir + "/libexec"
 	bin_dir := install_dir + "/bin"
-	/**
-	out, err := os.Create(fname)
-	check(err)
-	**/
-	// TODO set proxy
-	//  a)https://stackoverflow.com/questions/14661511/setting-up-proxy-for-http-client
-	// b)https://stackoverflow.com/questions/14669958/error-when-fetching-url-through-proxy-in-go
-
-	/**
-		resp, err := http.Get(url)
-		check(err)
-
-		defer resp.Body.Close()
-
-		_, err = io.Copy(out, resp.Body)
-		check(err)
-		out.Close()
-
-		// untar file
-		f, err := os.Open(fname)
-		check(err)
-		//	defer f.Close()
-
-		r := bufio.NewReader(f)
-		err = untar(".", r)
-		check(err)
-		err = f.Close()
-		check(err)
-	**/
 	os.MkdirAll(install_dir, 0700)
 	os.MkdirAll(lib_dir, 0700)
 	os.MkdirAll(lib_exec, 0700)
@@ -179,12 +146,4 @@ func main() {
 	cmd.Stdin = os.Stdin
 
 	cmd.Run()
-
-	// delete  install files
-	/**
-		err := os.RemoveAll("clojure-tools")
-		check(err)
-		err = os.Remove(fname)
-		check(err)
-	**/
 }
