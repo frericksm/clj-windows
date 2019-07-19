@@ -111,7 +111,7 @@ func check(err error) {
 //
 func main() {
 
-	version := "1.10.1.462"
+	version := "1.10.1.466"
 	/**
 		url := fmt.Sprintf("https://download.clojure.org/install/clojure-tools-%s.tar.gz", version)
 		fname := fmt.Sprintf("clojure-tools-%s.tar.gz", version)
