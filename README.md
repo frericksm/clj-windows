@@ -50,11 +50,11 @@ install.exe does the following things:
 ### Steps 
 1. Checkout https://github.com/frericksm/clj-windows.git
 2. change directory to clj-windows/clojure
-3. run "go build "
+3. run "GOOS=windows GOARCH=amd64 go build"
 4. change directory to clj-windows/clj
-5. run "go build "
+5. run "GOOS=windows GOARCH=amd64 go build"
 6. change directory to /clj-windows/install
-7. run "go build"
+7. run "GOOS=windows GOARCH=amd64 go build"
 8. change directory to /clj-windows
 9. run "mvn package"
 10. see clj-windows/target for build results  an follow the installation task above
