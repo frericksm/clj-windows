@@ -129,7 +129,7 @@ func usage() {
 
 func main() {
 
-	version := "1.10.1.469"
+	version := "1.10.1.478"
 
 	exec_path, _ := os.Executable()
 	wd := filepath.Dir(exec_path)
@@ -231,12 +231,12 @@ func main() {
 		return
 	}
 	config_paths := make([]string, 0)
+	config_user := ""
+	config_project := ""
 
 	config_dir := os.Getenv("CLJ_CONFIG")
 	config_home := os.Getenv("XDG_CONFIG_HOME")
 	home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-	var config_str string
-
 	var cmd *exec.Cmd
 	var cmd_args []string
 
@@ -289,16 +289,16 @@ func main() {
 	}
 
 	// Chain deps.edn in config paths. repro=skip config dir
+	config_project="deps.edn"
 	if repro {
 		config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	} else {
+		config_user=config_dir + "/deps.edn"
 		config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, config_dir+"/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	}
-	config_str = fmt.Sprintf(",%s", strings.Join(config_paths, ","))[1:]
-
 	// Determine whether to use user or project cache
 
 	if deps_edn_file_exists {
@@ -417,8 +417,8 @@ func main() {
 
 	}
 	if stale {
-
-		make_classpath_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath", "--config-files", config_str, "--libs-file", libs_file, "--cp-file", cp_file, "--jvm-file", jvm_file, "--main-file", main_file}
+		
+		make_classpath_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath2", "--config-user", config_user,"--config-project", config_project, "--libs-file", libs_file, "--cp-file", cp_file, "--jvm-file", jvm_file, "--main-file", main_file}
 
 		cmd_args = proxyargs()
 		cmd_args = append(cmd_args, make_classpath_args...)
@@ -446,7 +446,7 @@ func main() {
 	}
 
 	if pom {
-		cmd_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.generate-manifest", "--config-files", config_str, "--gen=pom"}
+		cmd_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.generate-manifest2","--config-user", config_user,"--config-project", config_project, "--gen=pom"}
 		cmd_args = append(cmd_args, tools_args...)
 		cmd = exec.Command("java.exe", cmd_args...)
 
@@ -471,6 +471,8 @@ func main() {
 
 		fmt.Printf("\n{:version \"%s\"\n"+
 			":config-files [%s]\n"+
+			":config-user [%s]\n"+
+			":config-project [%s]\n"+
 			":install-dir \"%s\"\n"+
 			":config-dir \"%s\"\n"+
 			":cache-dir \"%s\"\n"+
@@ -480,7 +482,7 @@ func main() {
 			":classpath-aliases \"%s\"\n"+
 			":jvm-aliases \"%s\"\n"+
 			":main-aliases \"%s\"\n"+
-			":all-aliases \"%s\"\n}\n", version, path_vector,
+			":all-aliases \"%s\"\n}\n", version, path_vector,config_user, config_project,
 			install_dir, config_dir, cache_dir, force, repro, strings.Join(resolve_aliases, ""),
 			strings.Join(classpath_aliases, ":"), strings.Join(jvm_aliases, ""),
 			strings.Join(main_aliases, ":"), strings.Join(all_aliases, ""))
