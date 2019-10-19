@@ -108,6 +108,7 @@ func usage() {
 	 -Sresolve-tags Resolve git coordinate tags to shas and update deps.edn
 	 -Sverbose      Print important path info to console
 	 -Sdescribe     Print environment and command parsing info as data
+         -Strace        Write a trace.edn file that traces deps expansion
 
 	init-opt:
 	 -i, --init path     Load a file or resource
@@ -129,7 +130,7 @@ func usage() {
 
 func main() {
 
-	version := "1.10.1.469"
+	version := "1.10.1.489"
 
 	exec_path, _ := os.Executable()
 	wd := filepath.Dir(exec_path)
@@ -153,6 +154,7 @@ func main() {
 	print_classpath := false
 	describe := false
 	verbose := false
+	trace := false
 	force := false
 	repro := false
 	tree := false
@@ -200,6 +202,8 @@ func main() {
 			verbose = true
 		case strings.HasPrefix(arg, "-Sdescribe"):
 			describe = true
+		case strings.HasPrefix(arg, "-Strace"):
+			trace = true
 		case strings.HasPrefix(arg, "-Sforce"):
 			force = true
 		case strings.HasPrefix(arg, "-Srepro"):
@@ -231,12 +235,12 @@ func main() {
 		return
 	}
 	config_paths := make([]string, 0)
+	config_user := ""
+	config_project := ""
 
 	config_dir := os.Getenv("CLJ_CONFIG")
 	config_home := os.Getenv("XDG_CONFIG_HOME")
 	home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-	var config_str string
-
 	var cmd *exec.Cmd
 	var cmd_args []string
 
@@ -289,16 +293,16 @@ func main() {
 	}
 
 	// Chain deps.edn in config paths. repro=skip config dir
+	config_project="deps.edn"
 	if repro {
 		config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	} else {
+		config_user=config_dir + "/deps.edn"
 		config_paths = append(config_paths, install_dir+"/lib/deps.edn")
 		config_paths = append(config_paths, config_dir+"/deps.edn")
 		config_paths = append(config_paths, "deps.edn")
 	}
-	config_str = fmt.Sprintf(",%s", strings.Join(config_paths, ","))[1:]
-
 	// Determine whether to use user or project cache
 
 	if deps_edn_file_exists {
@@ -357,7 +361,7 @@ func main() {
 	if _, err := os.Stat(cp_file); err == nil {
 		cp_file_exists = true
 	}
-	if force || !cp_file_exists {
+	if force || trace || !cp_file_exists {
 		stale = true
 	} else {
 		cp_file_info, err := os.Stat(cp_file)
@@ -408,6 +412,10 @@ func main() {
 			tools_args = append(tools_args, "--skip-cp")
 
 		}
+		if trace {
+			tools_args = append(tools_args, "--trace")
+
+		}
 
 	}
 
@@ -417,8 +425,8 @@ func main() {
 
 	}
 	if stale {
-
-		make_classpath_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath", "--config-files", config_str, "--libs-file", libs_file, "--cp-file", cp_file, "--jvm-file", jvm_file, "--main-file", main_file}
+		
+		make_classpath_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath2", "--config-user", config_user,"--config-project", config_project, "--libs-file", libs_file, "--cp-file", cp_file, "--jvm-file", jvm_file, "--main-file", main_file}
 
 		cmd_args = proxyargs()
 		cmd_args = append(cmd_args, make_classpath_args...)
@@ -446,7 +454,7 @@ func main() {
 	}
 
 	if pom {
-		cmd_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.generate-manifest", "--config-files", config_str, "--gen=pom"}
+		cmd_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.generate-manifest2","--config-user", config_user,"--config-project", config_project, "--gen=pom"}
 		cmd_args = append(cmd_args, tools_args...)
 		cmd = exec.Command("java.exe", cmd_args...)
 
@@ -471,6 +479,8 @@ func main() {
 
 		fmt.Printf("\n{:version \"%s\"\n"+
 			":config-files [%s]\n"+
+			":config-user [%s]\n"+
+			":config-project [%s]\n"+
 			":install-dir \"%s\"\n"+
 			":config-dir \"%s\"\n"+
 			":cache-dir \"%s\"\n"+
@@ -480,7 +490,7 @@ func main() {
 			":classpath-aliases \"%s\"\n"+
 			":jvm-aliases \"%s\"\n"+
 			":main-aliases \"%s\"\n"+
-			":all-aliases \"%s\"\n}\n", version, path_vector,
+			":all-aliases \"%s\"\n}\n", version, path_vector,config_user, config_project,
 			install_dir, config_dir, cache_dir, force, repro, strings.Join(resolve_aliases, ""),
 			strings.Join(classpath_aliases, ":"), strings.Join(jvm_aliases, ""),
 			strings.Join(main_aliases, ":"), strings.Join(all_aliases, ""))
@@ -488,19 +498,21 @@ func main() {
 	} else if tree {
 		cmd_args = []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.print-tree", "--libs-file", libs_file}
 		cmd = exec.Command("java.exe", cmd_args...)
-
+		
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
-
+		
 		//		fmt.Println("print-tree")
 		//		fmt.Println(cmd_args)
 		cmd.Run()
 		return
+	} else if trace {
+		fmt.Println("Writing trace.edn")
 	} else {
 		var jvm_cache_opts string
 		var main_cache_opts string
-
+		
 		if _, err := os.Stat(jvm_file); err == nil {
 			content, err = ioutil.ReadFile(jvm_file)
 			jvm_cache_opts = string(content)
@@ -511,38 +523,38 @@ func main() {
 			main_cache_opts = string(content)
 			check(err)
 		}
-
+		
 		jvm_opts_string := strings.Join(jvm_opts, " ")
 		cmd_args = make([]string, 0)
-
+		
 		if jvm_cache_opts != "" {
 			cmd_args = append(cmd_args, jvm_cache_opts)
-
+			
 		}
-
+		
 		if len(jvm_opts) > 0 {
 			cmd_args = append(cmd_args, jvm_opts_string)
-
+			
 		}
 		cmd_args = append(cmd_args, "-Dclojure.libfile="+libs_file, "-cp", cp, "clojure.main")
 
 		if main_cache_opts != "" {
 			words := strings.Fields(main_cache_opts)
 			cmd_args = append(cmd_args, words...)
-
+			
 		}
-
+		
 		cmd_args = append(cmd_args, additional_args...)
-
+		
 		cmd = exec.Command("java.exe", cmd_args...)
-
+		
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
 		//		fmt.Println("clojure.main")
-
+		
 		//		fmt.Println(cmd_args)
 		cmd.Run()
-
+		
 	}
 }

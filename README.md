@@ -24,7 +24,7 @@ and https://dev.clojure.org/jira/browse/TDEPS-67 for progress  on the windows pa
 ## Installation
 1. Download the latest release from https://github.com/frericksm/clj-windows/releases
 2. Extract it to some `<local-path>`
-3. Execute `<local-path>`\windows-clojure-tools-1.10.1.469\install.exe [install_dir]
+3. Execute `<local-path>`\windows-clojure-tools-1.10.1.489\install.exe [install_dir]
 with the optional install_dir
 
 ### How install.exe works:
