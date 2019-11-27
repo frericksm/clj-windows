@@ -130,8 +130,8 @@ func usage() {
 
 func main() {
 
-	version := "1.10.1.489"
 
+	version := "1.10.1.489"
 	exec_path, _ := os.Executable()
 	wd := filepath.Dir(exec_path)
 	local_install_dir := filepath.Dir(wd)
