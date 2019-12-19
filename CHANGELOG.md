@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file
 	see also https://github.com/clojure/brew-install/blob/1.10.1/CHANGELOG.md for
 changes introduced by the official installer
+## next
+### Changed
+Remove -Xms on tool jvms
 
 
 ##[1.10.1.489] 2019-11-27
