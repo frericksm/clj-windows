@@ -255,7 +255,7 @@ func main() {
 			fmt.Println("deps.edn does not exist")
 			return
 		}
-		cmd = exec.Command("java.exe", "-Xms256m", "-cp", tools_cp, "clojure.main", "-m",
+		cmd = exec.Command("java.exe",  "-cp", tools_cp, "clojure.main", "-m",
 			"clojure.tools.deps.alpha.script.resolve-tags", "--deps-file=deps.edn")
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -426,7 +426,7 @@ func main() {
 	}
 	if stale {
 		
-		make_classpath_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath2", "--config-user", config_user,"--config-project", config_project, "--libs-file", libs_file, "--cp-file", cp_file, "--jvm-file", jvm_file, "--main-file", main_file}
+		make_classpath_args := []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath2", "--config-user", config_user,"--config-project", config_project, "--libs-file", libs_file, "--cp-file", cp_file, "--jvm-file", jvm_file, "--main-file", main_file}
 
 		cmd_args = proxyargs()
 		cmd_args = append(cmd_args, make_classpath_args...)
@@ -454,7 +454,7 @@ func main() {
 	}
 
 	if pom {
-		cmd_args := []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.generate-manifest2","--config-user", config_user,"--config-project", config_project, "--gen=pom"}
+		cmd_args := []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.generate-manifest2","--config-user", config_user,"--config-project", config_project, "--gen=pom"}
 		cmd_args = append(cmd_args, tools_args...)
 		cmd = exec.Command("java.exe", cmd_args...)
 
@@ -496,7 +496,7 @@ func main() {
 			strings.Join(main_aliases, ":"), strings.Join(all_aliases, ""))
 
 	} else if tree {
-		cmd_args = []string{"-Xms256m", "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.print-tree", "--libs-file", libs_file}
+		cmd_args = []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.print-tree", "--libs-file", libs_file}
 		cmd = exec.Command("java.exe", cmd_args...)
 		
 		cmd.Stdout = os.Stdout
