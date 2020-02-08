@@ -3,11 +3,18 @@ All notable changes to this project will be documented in this file
 	see also https://github.com/clojure/brew-install/blob/1.10.1/CHANGELOG.md for
 changes introduced by the official installer
 ## next
+
+## [1.10.1.507] 2020-02-08
+### Changed
+- Update to tools.deps.alpha 0.8.661
+- Add -Sthreads option for concurrent downloads
+- Use -- to separate dep options and clojure.main options
+- Report clj version in clj -h
+	
 ### Changed
 Remove -Xms on tool jvms
 
-
-##[1.10.1.489] 2019-11-27
+## [1.10.1.489] 2019-11-27
 ### Changed
 - Added -Strace option
 - Update to tools.deps.alpha 0.8.599

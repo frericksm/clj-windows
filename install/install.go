@@ -111,7 +111,7 @@ func check(err error) {
 //
 func main() {
 
-	version := "1.10.1.489"
+	version := "1.10.1.507"
 	lib_name := fmt.Sprintf("clojure-tools-%s.jar", version)
 
 	prefix_dir := os.Getenv("localappdata") + "/Programs"

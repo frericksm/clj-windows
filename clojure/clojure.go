@@ -81,9 +81,10 @@ func copy(src string, dest string) {
 
 }
 
-func usage() {
-	fmt.Println(` 	Usage: clojure [dep-opt*] [init-opt*] [main-opt] [arg*]
-	       clj     [dep-opt*] [init-opt*] [main-opt] [arg*]
+func usage(version string) {
+	fmt.Printf("Version: %s\n", version)	
+	fmt.Println(` 	Usage: clojure [dep-opt*] [--] [init-opt*] [main-opt] [arg*]
+	       clj     [dep-opt*] [init-opt*] [--] [main-opt] [arg*]
 
 	The clojure script is a runner for Clojure. clj is a wrapper
 	for interactive repl use. These scripts ultimately construct and
@@ -108,7 +109,9 @@ func usage() {
 	 -Sresolve-tags Resolve git coordinate tags to shas and update deps.edn
 	 -Sverbose      Print important path info to console
 	 -Sdescribe     Print environment and command parsing info as data
+         -Sthreads      Set specific number of download threads
          -Strace        Write a trace.edn file that traces deps expansion
+         --             Stop parsing dep options and pass remaining arguments to clojure.main
 
 	init-opt:
 	 -i, --init path     Load a file or resource
@@ -131,7 +134,7 @@ func usage() {
 func main() {
 
 
-	version := "1.10.1.489"
+	version := "1.10.1.507"
 	exec_path, _ := os.Executable()
 	wd := filepath.Dir(exec_path)
 	local_install_dir := filepath.Dir(wd)
@@ -153,6 +156,7 @@ func main() {
 	tools_cp := install_dir + jarfile
 	print_classpath := false
 	describe := false
+	threads:= ""
 	verbose := false
 	trace := false
 	force := false
@@ -223,6 +227,8 @@ func main() {
 			if len(main_aliases) == 0 && len(all_aliases) == 0 {
 				help = true
 			}
+                case strings.HasPrefix(arg, "--"):
+			break
 		default:
 			additional_args = append(additional_args, arg)
 		}
@@ -231,7 +237,7 @@ func main() {
 	//	fmt.Printf("additional args: %s", additional_args)
 
 	if help {
-		usage()
+		usage(version)
 		return
 	}
 	config_paths := make([]string, 0)
@@ -416,7 +422,10 @@ func main() {
 			tools_args = append(tools_args, "--trace")
 
 		}
-
+		if threads!= "" {
+			tools_args = append(tools_args, "--threads", threads)
+		}
+		
 	}
 
 	// If stale, run make-classpath to refresh cached classpath
