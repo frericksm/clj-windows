@@ -206,6 +206,9 @@ func main() {
 			verbose = true
 		case strings.HasPrefix(arg, "-Sdescribe"):
 			describe = true
+		case strings.HasPrefix(arg, "-Sthreads"):
+			i = i + 1
+			threads = os.Args[i]
 		case strings.HasPrefix(arg, "-Strace"):
 			trace = true
 		case strings.HasPrefix(arg, "-Sforce"):
