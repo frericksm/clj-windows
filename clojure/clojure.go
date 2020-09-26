@@ -165,14 +165,16 @@ func main() {
 	pom := false
 	resolve_tags := false
 	help := false
+	prep :=false
 	stale := false
 
 	jvm_opts := make([]string, 0)
 	resolve_aliases := make([]string, 0)
 	classpath_aliases := make([]string, 0)
-	jvm_aliases := make([]string, 0)
 	main_aliases := make([]string, 0)
-	all_aliases := make([]string, 0)
+	exec_aliases := make([]string, 0)
+	repl_aliases := make([]string, 0)
+	mode := "repl"
 	var deps_data string
 	var force_cp string
 	var deps_edn_file_exists bool
@@ -186,14 +188,31 @@ func main() {
 			jvm_opts = append(jvm_opts, arg[2:])
 		case strings.HasPrefix(arg, "-R"):
 			resolve_aliases = append(resolve_aliases, arg[2:])
+			fmt.Println("-R is deprecated, use -A with repl, -M for main, or -X for exec")
 		case strings.HasPrefix(arg, "-C"):
 			classpath_aliases = append(classpath_aliases, arg[2:])
+			fmt.Println("-C is deprecated, use -A with repl, -M for main, or -X for exec")
 		case strings.HasPrefix(arg, "-O"):
-			jvm_aliases = append(jvm_aliases, arg[2:])
-		case strings.HasPrefix(arg, "-M"):
-			main_aliases = append(main_aliases, arg[2:])
+			fmt.Println("-O is no longer supported, use -A with repl, -M for main, or -X for exec")
+			break
 		case strings.HasPrefix(arg, "-A"):
-			all_aliases = append(all_aliases, arg[2:])
+			repl_aliases = append(repl_aliases, arg[2:])
+		case arg == "-M":
+			mode = "main"
+			break
+		case strings.HasPrefix(arg, "-M"):
+			mode = "main"
+			main_aliases = append(main_aliases, arg[2:])
+			break
+		case arg == "-X":
+			mode = "exec"
+			break
+		case strings.HasPrefix(arg, "-X"):
+			mode = "exec"
+			main_aliases = append(exec_aliases, arg[2:])
+			break
+		case arg == "-P":
+			prep = true
 		case strings.HasPrefix(arg, "-Sdeps"):
 			i = i + 1
 			deps_data = os.Args[i]
@@ -220,6 +239,8 @@ func main() {
 		case strings.HasPrefix(arg, "-Spom"):
 			pom = true
 		case strings.HasPrefix(arg, "-Sresolve-tags"):
+			fmt.Println("Option changed, use: clj -X:deps git-resolve-tags")
+			break
 
 			resolve_tags = true
 		case strings.HasPrefix(arg, "-S"):
@@ -227,7 +248,7 @@ func main() {
 
 			resolve_tags = true
 		case (strings.HasPrefix(arg, "-h") || strings.HasPrefix(arg, "--help") || strings.HasPrefix(arg, "-?")):
-			if len(main_aliases) == 0 && len(all_aliases) == 0 {
+			if len(main_aliases) == 0 && len(repl_aliases) == 0 {
 				help = true
 			}
                 case strings.HasPrefix(arg, "--"):
@@ -325,8 +346,8 @@ func main() {
 	joined_result := make([]string, 0)
 	joined_result = append(joined_result, resolve_aliases...)
 	joined_result = append(joined_result, classpath_aliases...)
-	joined_result = append(joined_result, all_aliases...)
-	joined_result = append(joined_result, jvm_aliases...)
+	joined_result = append(joined_result, repl_aliases...)
+	joined_result = append(joined_result, exec_aliases...)
 	joined_result = append(joined_result, main_aliases...)
 	joined_result = append(joined_result, deps_data)
 
@@ -353,6 +374,7 @@ func main() {
 	cp_file := cache_dir + "/" + ck + ".cp"
 	jvm_file := cache_dir + "/" + ck + ".jvm"
 	main_file := cache_dir + "/" + ck + ".main"
+	basis_file := cache_dir + "/" + ck + ".basis"
 
 	// Print paths in verbose mode
 	if verbose {
@@ -370,7 +392,7 @@ func main() {
 	if _, err := os.Stat(cp_file); err == nil {
 		cp_file_exists = true
 	}
-	if force || trace || !cp_file_exists {
+	if force || trace ||prep || !cp_file_exists {
 		stale = true
 	} else {
 		cp_file_info, err := os.Stat(cp_file)
@@ -408,14 +430,14 @@ func main() {
 		if len(classpath_aliases) > 0 {
 			tools_args = append(tools_args, "-C"+strings.Join(classpath_aliases, ""))
 		}
-		if len(jvm_aliases) > 0 {
-			tools_args = append(tools_args, "-J"+strings.Join(jvm_aliases, ""))
-		}
 		if len(main_aliases) > 0 {
 			tools_args = append(tools_args, "-M"+strings.Join(main_aliases, ""))
 		}
-		if len(all_aliases) > 0 {
-			tools_args = append(tools_args, "-A"+strings.Join(all_aliases, ""))
+		if len(repl_aliases) > 0 {
+			tools_args = append(tools_args, "-A"+strings.Join(repl_aliases, ""))
+		}
+		if len(exec_aliases) > 0 {
+			tools_args = append(tools_args, "-X"+strings.Join(exec_aliases, ""))
 		}
 		if force_cp != "" {
 			tools_args = append(tools_args, "--skip-cp")
@@ -464,7 +486,10 @@ func main() {
 		check(err)
 		cp = string(content)
 	}
-
+	if prep {
+		os.Exit(0)
+	} 
+	
 	if pom {
 		cmd_args := []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.generate-manifest2","--config-user", config_user,"--config-project", config_project, "--gen=pom"}
 		cmd_args = append(cmd_args, tools_args...)
@@ -498,14 +523,9 @@ func main() {
 			":cache-dir \"%s\"\n"+
 			":force %t\n"+
 			":repro %t\n"+
-			":resolve-aliases \"%s\"\n"+
-			":classpath-aliases \"%s\"\n"+
-			":jvm-aliases \"%s\"\n"+
 			":main-aliases \"%s\"\n"+
-			":all-aliases \"%s\"\n}\n", version, path_vector,config_user, config_project,
-			install_dir, config_dir, cache_dir, force, repro, strings.Join(resolve_aliases, ""),
-			strings.Join(classpath_aliases, ":"), strings.Join(jvm_aliases, ""),
-			strings.Join(main_aliases, ":"), strings.Join(all_aliases, ""))
+			":repl-aliases \"%s\"\n}\n", version, path_vector,config_user, config_project,
+			install_dir, config_dir, cache_dir, force, repro, strings.Join(main_aliases, ":"), strings.Join(repl_aliases, ""))
 
 	} else if tree {
 		cmd_args = []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.print-tree", "--libs-file", libs_file}
@@ -515,12 +535,10 @@ func main() {
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
 		
-		//		fmt.Println("print-tree")
-		//		fmt.Println(cmd_args)
 		cmd.Run()
 		return
 	} else if trace {
-		fmt.Println("Writing trace.edn")
+		fmt.Println("Wrote trace.edn")
 	} else {
 		var jvm_cache_opts string
 		var main_cache_opts string
@@ -530,43 +548,64 @@ func main() {
 			jvm_cache_opts = string(content)
 			check(err)
 		}
-		if _, err := os.Stat(main_file); err == nil {
-			content, err = ioutil.ReadFile(main_file)
-			main_cache_opts = string(content)
-			check(err)
-		}
 		
-		jvm_opts_string := strings.Join(jvm_opts, " ")
-		cmd_args = make([]string, 0)
 		
-		if jvm_cache_opts != "" {
-			cmd_args = append(cmd_args, jvm_cache_opts)
+		if mode == "exec" {
+			var exec_args = make([]string, 0)
 			
-		}
-		
-		if len(jvm_opts) > 0 {
-			cmd_args = append(cmd_args, jvm_opts_string)
+			if len(exec_aliases) > 0 {
+				exec_args= append(exec_args, "--aliases")
+				exec_args= append(exec_args, exec_aliases...)
 			
-		}
-		cmd_args = append(cmd_args, "-Dclojure.libfile="+libs_file, "-cp", cp, "clojure.main")
+			} else {
+				jvm_opts_string := strings.Join(jvm_opts, " ")
+				cmd_args = make([]string, 0)
+				
+				if jvm_cache_opts != "" {
+					cmd_args = append(cmd_args, jvm_cache_opts)
+					
+				}
+				
+				if len(jvm_opts) > 0 {
+					cmd_args = append(cmd_args, jvm_opts_string)
+					
+				}
+				
+				
+			}
+			cmd_args = append(cmd_args, "-Dclojure.basis="+basis_file, "-classpath",  install_dir+ "/libexec/exec.jar", "clojure.main", "-m", "clojure.run.exec")
+			cmd_args = append(cmd_args, exec_args...)
+			cmd = exec.Command("java.exe", cmd_args...)
+			
+			
+		} else {
+			if _, err := os.Stat(main_file); err == nil {
+				content, err = ioutil.ReadFile(main_file)
+				main_cache_opts = string(content)
+				check(err)
+			}
 
-		if main_cache_opts != "" {
-			words := strings.Fields(main_cache_opts)
-			cmd_args = append(cmd_args, words...)
 			
+			cmd_args = append(cmd_args, "-Dclojure.libfile="+libs_file, "-cp", cp, "clojure.main")
+
+			if main_cache_opts != "" {
+				words := strings.Fields(main_cache_opts)
+				cmd_args = append(cmd_args, words...)
+				
+			}
+			if len(additional_args) > 0 && mode== "repl" {
+				fmt.Println("WARNING: When invoking clojure.main, use -M")
+			}
+				
+			cmd_args = append(cmd_args, "-Dclojure.basis="+basis_file, "-classpath",  cp, "clojure.main", "clojure.run.exec", main_cache_opts)
+				cmd_args = append(cmd_args, additional_args...)
+				
+				cmd = exec.Command("java.exe", cmd_args...)
+				
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				cmd.Stdin = os.Stdin
+				cmd.Run()		
+			}
 		}
-		
-		cmd_args = append(cmd_args, additional_args...)
-		
-		cmd = exec.Command("java.exe", cmd_args...)
-		
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Stdin = os.Stdin
-		//		fmt.Println("clojure.main")
-		
-		//		fmt.Println(cmd_args)
-		cmd.Run()
-		
-	}
 }
