@@ -111,7 +111,7 @@ func check(err error) {
 //
 func main() {
 
-	version := "1.10.1.510"
+	version := "1.10.1.697"
 	lib_name := fmt.Sprintf("clojure-tools-%s.jar", version)
 
 	prefix_dir := os.Getenv("localappdata") + "/Programs"
@@ -132,6 +132,7 @@ func main() {
 	copy("deps.edn", lib_dir+"/deps.edn")
 	copy("example-deps.edn", lib_dir+"/example-deps.edn")
 	copy(lib_name, lib_exec+"/"+lib_name)
+	copy(lib_name, lib_exec+"/exec.jar")
 	copy("clojure.exe", bin_dir+"/clojure.exe")
 	copy("clj.exe", bin_dir+"/clj.exe")
 
