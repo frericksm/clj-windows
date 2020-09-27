@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 changes introduced by the official installer
 ## next
 
+## [1.10.1.697] 2020-09-27
+### Changed
+- Update to tools.deps.alpha 0.9.810
+
 ## [1.10.1.510] 2020-02-17
 ### Changed
 - Update to tools.deps.alpha 0.8.677
