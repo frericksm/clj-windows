@@ -596,7 +596,7 @@ func main() {
 				
 				
 			}
-			cmd_args = append(cmd_args, "-Dclojure.basis="+basis_file, "-classpath",  install_dir+ "/libexec/exec.jar", "clojure.main", "-m", "clojure.run.exec")
+			cmd_args = append(cmd_args, "-Dclojure.basis="+basis_file, "-classpath", cp + ";"+ install_dir+ "/libexec/exec.jar", "clojure.main", "-m", "clojure.run.exec")
 			cmd_args = append(cmd_args, exec_args...)
 			cmd = exec.Command("java.exe", cmd_args...)
 			
