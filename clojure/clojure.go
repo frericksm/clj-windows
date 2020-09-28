@@ -483,7 +483,7 @@ func main() {
 	}
 	if stale {
 		
-		make_classpath_args := []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath2", "--config-user", config_user,"--config-project", config_project, "--libs-file", libs_file, "--cp-file", cp_file, "--jvm-file", jvm_file, "--main-file", main_file}
+		make_classpath_args := []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath2", "--config-user", config_user,"--config-project", config_project,"--basis-file",basis_file,"--libs-file",libs_file,"--cp-file",cp_file,"--jvm-file",jvm_file,"--main-file",main_file}
 
 		cmd_args = proxyargs()
 		cmd_args = append(cmd_args, make_classpath_args...)
