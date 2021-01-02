@@ -1,5 +1,4 @@
-// win-clj project main.go
-//https://stackoverflow.com/questions/13913468/how-to-start-a-process
+// clj-win project main.go
 package main
 
 import (
@@ -156,26 +155,19 @@ func usage(version string) {
 
 func main() {
 
-
-	version := "1.10.1.697"
+	
+	version := "1.10.1.763"
 	exec_path, _ := os.Executable()
 	wd := filepath.Dir(exec_path)
 	local_install_dir := filepath.Dir(wd)
-	//	fmt.Println("wd: " + wd)
-	//	fmt.Println("local_install_dir: " + local_install_dir)
-
 	install_dir := os.Getenv("localappdata") + "/Programs/clojure"
-
+	
 	jarfile := fmt.Sprintf("/lib/libexec/clojure-tools-%s.jar", version)
 	local_jar := local_install_dir + jarfile
-
+	
 	if jarfile_exists, _ := exists(local_jar); jarfile_exists {
 		install_dir = local_install_dir
 	}
-	// fmt.Printf("local_install_dir: %s\n", local_install_dir)
-	// fmt.Printf("local_jar: %s\n", local_jar)
-	//fmt.Printf("install_dir: %s\n", install_dir)
-
 	tools_cp := install_dir + jarfile
 	print_classpath := false
 	describe := false
@@ -415,7 +407,7 @@ func main() {
 	if _, err := os.Stat(cp_file); err == nil {
 		cp_file_exists = true
 	}
-	if force || trace ||prep || !cp_file_exists {
+	if force || trace || tree ||prep || !cp_file_exists {
 		stale = true
 	} else {
 		cp_file_info, err := os.Stat(cp_file)
@@ -468,6 +460,10 @@ func main() {
 		}
 		if trace {
 			tools_args = append(tools_args, "--trace")
+
+		}
+		if tree {
+			tools_args = append(tools_args, "--tree")
 
 		}
 		if threads!= "" {
@@ -551,14 +547,6 @@ func main() {
 			install_dir, config_dir, cache_dir, force, repro, strings.Join(main_aliases, ":"), strings.Join(repl_aliases, ""))
 
 	} else if tree {
-		cmd_args = []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.print-tree", "--libs-file", libs_file}
-		cmd = exec.Command("java.exe", cmd_args...)
-		
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Stdin = os.Stdin
-		
-		cmd.Run()
 		return
 	} else if trace {
 		fmt.Println("Wrote trace.edn")
@@ -579,7 +567,7 @@ func main() {
 			if len(exec_aliases) > 0 {
 				exec_args= append(exec_args, "--aliases")
 				exec_args= append(exec_args, exec_aliases...)
-			
+				
 			} else {
 				jvm_opts_string := strings.Join(jvm_opts, " ")
 				cmd_args = make([]string, 0)
@@ -619,16 +607,16 @@ func main() {
 			if len(additional_args) > 0 && mode== "repl" {
 				fmt.Println("WARNING: When invoking clojure.main, use -M")
 			}
-				
-			cmd_args = append(cmd_args, "-Dclojure.basis="+basis_file, "-classpath",  cp, "clojure.main", "clojure.run.exec", main_cache_opts)
-				cmd_args = append(cmd_args, additional_args...)
-				
-				cmd = exec.Command("java.exe", cmd_args...)
-				
-				cmd.Stdout = os.Stdout
-				cmd.Stderr = os.Stderr
-				cmd.Stdin = os.Stdin
-				cmd.Run()		
-			}
+			
+			cmd_args = append(cmd_args, "-Dclojure.basis="+basis_file, "-classpath",  cp, "clojure.main", main_cache_opts)
+			cmd_args = append(cmd_args, additional_args...)
+			
+			cmd = exec.Command("java.exe", cmd_args...)
+			
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			cmd.Stdin = os.Stdin
+			cmd.Run()		
 		}
+	}
 }
