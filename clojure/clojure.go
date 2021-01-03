@@ -537,6 +537,7 @@ func main() {
 		}
 		
 		
+		cmd_args = make([]string, 0)
 		if mode == "exec" {
 			var exec_args = make([]string, 0)
 			
@@ -546,7 +547,6 @@ func main() {
 				
 			} else {
 				jvm_opts_string := strings.Join(jvm_opts, " ")
-				cmd_args = make([]string, 0)
 				
 				if jvm_cache_opts != "" {
 					cmd_args = append(cmd_args, jvm_cache_opts)
@@ -560,11 +560,11 @@ func main() {
 				
 				
 			}
-			cmd_args = append(cmd_args, fmt.Sprintf("-Dclojure.basis=%s", basis_file), "-classpath", cp + ";"+ install_dir+ "/libexec/exec.jar", "clojure.main", "-m", "clojure.run.exec")
+			cmd_args = append(cmd_args, fmt.Sprintf("-Dclojure.basis=%s", basis_file), "-classpath", cp + string(os.PathListSeparator)+ install_dir+ "/libexec/exec.jar", "clojure.main", "-m", "clojure.run.exec")
 			cmd_args = append(cmd_args, exec_args...)
 			cmd = exec.Command("java.exe", cmd_args...)
 			
-		} else {
+		} else { // else mode == "exec"
 			if _, err := os.Stat(main_file); err == nil {
 				content, err = ioutil.ReadFile(main_file)
 				main_cache_opts = string(content)
