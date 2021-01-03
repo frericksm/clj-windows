@@ -560,10 +560,9 @@ func main() {
 				
 				
 			}
-			cmd_args = append(cmd_args, "-Dclojure.basis="+basis_file, "-classpath", cp + ";"+ install_dir+ "/libexec/exec.jar", "clojure.main", "-m", "clojure.run.exec")
+			cmd_args = append(cmd_args, fmt.Sprintf("-Dclojure.basis=%s", basis_file), "-classpath", cp + ";"+ install_dir+ "/libexec/exec.jar", "clojure.main", "-m", "clojure.run.exec")
 			cmd_args = append(cmd_args, exec_args...)
 			cmd = exec.Command("java.exe", cmd_args...)
-			
 			
 		} else {
 			if _, err := os.Stat(main_file); err == nil {
@@ -571,16 +570,11 @@ func main() {
 				main_cache_opts = string(content)
 				check(err)
 			}
-			if main_cache_opts != "" {
-				words := strings.Fields(main_cache_opts)
-				cmd_args = append(cmd_args, words...)
-				
-			}
 			if len(additional_args) > 0 && mode== "repl" {
 				fmt.Println("WARNING: When invoking clojure.main, use -M")
 			}
 			
-			cmd_args = append(cmd_args, "-Dclojure.basis="+ fmt.Sprintf("%q", basis_file), "-classpath",  cp, "clojure.main", main_cache_opts)
+			cmd_args = append(cmd_args, fmt.Sprintf("-Dclojure.basis=%s", basis_file), "-classpath",  cp, "clojure.main", main_cache_opts)
 			cmd_args = append(cmd_args, additional_args...)
 			
 			cmd = exec.Command("java.exe", cmd_args...)
