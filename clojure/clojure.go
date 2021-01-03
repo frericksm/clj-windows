@@ -165,7 +165,7 @@ func main() {
 	jarfile := fmt.Sprintf("/lib/libexec/clojure-tools-%s.jar", version)
 	local_jar := local_install_dir + jarfile
 	
-	if jarfile_exists, _ := sexists(local_jar); jarfile_exists {
+	if jarfile_exists, _ := exists(local_jar); jarfile_exists {
 		install_dir = local_install_dir
 	}
 	tools_cp := install_dir + jarfile
