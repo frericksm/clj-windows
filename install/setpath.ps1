@@ -14,8 +14,11 @@ param
 
 if (!$install_dir) {
 $install_dir= $env:localappdata +"\Programs\clojure"
-}
 Echo "install_dir is  " + $install_dir 
+}
+else {
+Echo "install_dir is  " + $install_dir 
+}
 
 
 $bin_dir = $install_dir+ "\bin"
