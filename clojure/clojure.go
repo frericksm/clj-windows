@@ -165,7 +165,7 @@ func main() {
 	jarfile := fmt.Sprintf("/lib/libexec/clojure-tools-%s.jar", version)
 	local_jar := local_install_dir + jarfile
 	
-	if jarfile_exists, _ := exists(local_jar); jarfile_exists {
+	if jarfile_exists, _ := sexists(local_jar); jarfile_exists {
 		install_dir = local_install_dir
 	}
 	tools_cp := install_dir + jarfile
@@ -178,7 +178,6 @@ func main() {
 	repro := false
 	tree := false
 	pom := false
-	resolve_tags := false
 	help := false
 	prep :=false
 	stale := false
@@ -256,12 +255,8 @@ func main() {
 		case strings.HasPrefix(arg, "-Sresolve-tags"):
 			fmt.Println("Option changed, use: clj -X:deps git-resolve-tags")
 			break
-
-			resolve_tags = true
 		case strings.HasPrefix(arg, "-S"):
 			fmt.Println("Invalid option %s", arg)
-
-			resolve_tags = true
 		case (strings.HasPrefix(arg, "-h") || strings.HasPrefix(arg, "--help") || strings.HasPrefix(arg, "-?")):
 			if len(main_aliases) == 0 && len(repl_aliases) == 0 {
 				help = true
@@ -293,24 +288,7 @@ func main() {
 	if _, err := os.Stat("deps.edn"); os.IsNotExist(err) {
 		deps_edn_file_exists = false
 	}
-
-	if resolve_tags {
-
-		if !deps_edn_file_exists {
-			fmt.Println("deps.edn does not exist")
-			return
-		}
-		cmd = exec.Command("java.exe",  "-cp", tools_cp, "clojure.main", "-m",
-			"clojure.tools.deps.alpha.script.resolve-tags", "--deps-file=deps.edn")
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Stdin = os.Stdin
-
-		//		fmt.Println("resolve-tags")
-		//		fmt.Println(cmd_args)
-		cmd.Run()
-	}
-
+	
 	// Determine user config directory
 
 	if config_dir == "" && config_home != "" {
@@ -477,13 +455,13 @@ func main() {
 	}
 	if stale {
 		
-		make_classpath_args := []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath2", "--config-user", config_user,"--config-project", config_project,"--basis-file", fmt.Sprintf("%q", basis_file),"--libs-file",fmt.Sprintf("%q", libs_file),"--cp-file",fmt.Sprintf("%q", cp_file),"--jvm-file",fmt.Sprintf("%q", jvm_file),"--main-file",fmt.Sprintf("%q", main_file)}
-
+		make_classpath_args := []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath2", "--config-user", config_user,"--config-project", config_project,"--basis-file", basis_file,"--libs-file",libs_file,"--cp-file", cp_file,"--jvm-file", jvm_file,"--main-file", main_file}
+		
 		cmd_args = proxyargs()
 		cmd_args = append(cmd_args, make_classpath_args...)
 		cmd_args = append(cmd_args, tools_args...)
 		cmd = exec.Command("java.exe", cmd_args...)
-
+		
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
