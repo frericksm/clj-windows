@@ -384,11 +384,11 @@ func main() {
 	ck := fmt.Sprintf("%08x", crc32.Checksum([]byte(val), crc32q))
 
 	//	fmt.Printf("ck= %s\n", ck)
-	libs_file := fmt.Sprintf("\"%s/%s.libs\"", cache_dir,ck)
-	cp_file := fmt.Sprintf("\"%s/%s.cp\"", cache_dir,ck)
-	jvm_file := fmt.Sprintf("\"%s/%s.jvm\"", cache_dir,ck)
-	main_file := fmt.Sprintf("\"%s/%s.main\"", cache_dir,ck)
-	basis_file := fmt.Sprintf("\"%s/%s.basis\"", cache_dir,ck)
+	libs_file := fmt.Sprintf("%s/%s.libs", cache_dir,ck)
+	cp_file := fmt.Sprintf("%s/%s.cp", cache_dir,ck)
+	jvm_file := fmt.Sprintf("%s/%s.jvm", cache_dir,ck)
+	main_file := fmt.Sprintf("%s/%s.main", cache_dir,ck)
+	basis_file := fmt.Sprintf("%s/%s.basis", cache_dir,ck)
 	// Print paths in verbose mode
 	if verbose {
 		fmt.Printf("version      = %s\n", version)
@@ -477,7 +477,7 @@ func main() {
 	}
 	if stale {
 		
-		make_classpath_args := []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath2", "--config-user", config_user,"--config-project", config_project,"--basis-file",basis_file,"--libs-file",libs_file,"--cp-file",cp_file,"--jvm-file",jvm_file,"--main-file",main_file}
+		make_classpath_args := []string{ "-cp", tools_cp, "clojure.main", "-m", "clojure.tools.deps.alpha.script.make-classpath2", "--config-user", config_user,"--config-project", config_project,"--basis-file", fmt.Printf("%q", basis_file),"--libs-file",fmt.Printf("%q", libs_file),"--cp-file",fmt.Printf("%q", cp_file),"--jvm-file",fmt.Printf("%q", jvm_file),"--main-file",fmt.Printf("%q", main_file)}
 
 		cmd_args = proxyargs()
 		cmd_args = append(cmd_args, make_classpath_args...)
