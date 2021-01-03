@@ -384,11 +384,11 @@ func main() {
 	ck := fmt.Sprintf("%08x", crc32.Checksum([]byte(val), crc32q))
 
 	//	fmt.Printf("ck= %s\n", ck)
-	libs_file := fmt.Sprintf("%s/%s.libs", cache_dir,ck)
-	cp_file := fmt.Sprintf("%s/%s.cp", cache_dir,ck)
-	jvm_file := fmt.Sprintf("%s/%s.jvm", cache_dir,ck)
-	main_file := fmt.Sprintf("%s/%s.main", cache_dir,ck)
-	basis_file := fmt.Sprintf("%s/%s.basis", cache_dir,ck)
+	libs_file := filepath.Join(cache_dir, ck + ".libs")
+	cp_file := filepath.Join(cache_dir, ck + ".cp")
+	jvm_file := filepath.Join(cache_dir, ck + ".jvm")
+	main_file := filepath.Join(cache_dir, ck + ".main")
+	basis_file := filepath.Join(cache_dir, ck + ".basis")
 	// Print paths in verbose mode
 	if verbose {
 		fmt.Printf("version      = %s\n", version)
