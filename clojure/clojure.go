@@ -580,7 +580,7 @@ func main() {
 				fmt.Println("WARNING: When invoking clojure.main, use -M")
 			}
 			
-			cmd_args = append(cmd_args, "-Dclojure.basis="+basis_file, "-classpath",  cp, "clojure.main", main_cache_opts)
+			cmd_args = append(cmd_args, "-Dclojure.basis="+ fmt.Sprintf("%q", basis_file), "-classpath",  cp, "clojure.main", main_cache_opts)
 			cmd_args = append(cmd_args, additional_args...)
 			
 			cmd = exec.Command("java.exe", cmd_args...)
